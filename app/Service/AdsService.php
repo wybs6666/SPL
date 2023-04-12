@@ -32,7 +32,7 @@ class AdsService
         else{
             $createReturn = CurlService::post(ADS_URL . '/api/v1/group/create', ['group_name' => 'FbBadReview']);
             if (isset($createReturn['code'])&&$createReturn['code']==0){
-                $this->group_id = $return['data']['group_id'];
+                $this->group_id = $createReturn['data']['group_id'];
             }else{
                 throw new \Exception('创建分组失败');
             }
