@@ -5,7 +5,6 @@ namespace App\Service;
 use Illuminate\Support\Facades\URL;
 
 define('ADS_URL', 'http://localhost:50325');
-define('GROUP_ID', '2328592');
 define('PROXY_HOST', '23.106.33.181');
 define('PROXY_PORT', '50000');
 define('PROXY_USER', 'user8000');
@@ -20,6 +19,24 @@ class AdsService
     public $selenium = '';
     public $webdriver = '';
     public $debug_port = '';
+    public $group_id = '';
+
+    public function __construct()
+    {
+        //寻找分组
+        $return = CurlService::get(ADS_URL . '/api/v1/group/list', ['group_name' => 'FbBadReview']);
+        if (isset($return['code'])&&$return['code']==0&&count($return['data']['list'])>0){
+            $this->group_id = $return['data']['list'][0]['group_id'];
+        }
+        //尝试创建分组
+        else{
+            $createReturn = CurlService::post(ADS_URL . '/api/v1/group/create', ['group_name' => 'FbBadReview']);
+            if (!$createReturn){
+                throw new \Exception('创建分组失败');
+            }
+        }
+
+    }
 
     public function deleteBrowser(){
         $return = CurlService::post(ADS_URL . '/api/v1/user/delete', ['user_ids' => [$this->id]]);
@@ -48,12 +65,12 @@ class AdsService
             'proxy_type' => 'http',
             'proxy_host' => PROXY_HOST,
             'proxy_port' => PROXY_PORT,
-            'proxy_user' => PROXY_USER,
+            'proxy_user' => 'user'.rand(8000,10000),
             'proxy_password' => PROXY_PASSWORD,
             'proxy_soft' => PROXY_SOFT
         ];
         $return = CurlService::post(ADS_URL . '/api/v1/user/create', [
-            'group_id' => GROUP_ID,
+            'group_id' => $this->group_id,
             //'user_proxy_config' => ['proxy_soft'=>'no_proxy'],
             'user_proxy_config' => $proxy,
             'fingerprint_config' => [
