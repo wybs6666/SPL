@@ -2,6 +2,8 @@
 
 namespace App\Console\Commands;
 
+use App\Models\Account;
+use App\Models\AccountLog;
 use App\Service\AdsService;
 use Facebook\WebDriver\Chrome\ChromeOptions;
 use Facebook\WebDriver\Remote\DesiredCapabilities;
@@ -50,7 +52,14 @@ class PostBadReview extends Command
         for ($i = 1; $i <= $times; $i++) {
             //配置浏览器信息
             $ads = new AdsService();
-            $return = $ads->createBrowser(['cookie'=>'[{"domain":".facebook.com","expiry":1710309997103,"httpOnly":true,"name":"datr","path":"/","priority":"Medium","sameParty":false,"secure":true,"session":false,"size":24,"sourcePort":443,"sourceScheme":"Secure","value":"3LwOZMiBJAKvpDS2jXJXXV3v"},{"domain":".facebook.com","expiry":1710309997103,"httpOnly":false,"name":"dpr","path":"/","priority":"Medium","sameParty":false,"secure":false,"session":false,"size":1,"sourcePort":443,"sourceScheme":"Secure","value":"2"},{"domain":".facebook.com","expiry":1710309997103,"httpOnly":true,"name":"sb","path":"/","priority":"Medium","sameParty":false,"secure":true,"session":false,"size":24,"sourcePort":443,"sourceScheme":"Secure","value":"87wOZD_cR4cDxBTFSqInixnW"},{"domain":".facebook.com","expiry":1710309997103,"httpOnly":false,"name":"c_user","path":"/","priority":"Medium","sameParty":false,"secure":true,"session":false,"size":15,"sourcePort":443,"sourceScheme":"Secure","value":"100090421148530"},{"domain":".facebook.com","expiry":1710309997103,"httpOnly":true,"name":"xs","path":"/","priority":"Medium","sameParty":false,"secure":true,"session":false,"size":45,"sourcePort":443,"sourceScheme":"Secure","value":"3%3Aa8OWlUC9oGABiA%3A2%3A1678687577%3A-1%3A-1"},{"domain":".facebook.com","expiry":1710309997103,"httpOnly":false,"name":"wd","path":"/","priority":"Medium","sameParty":false,"secure":true,"session":false,"size":7,"sourcePort":443,"sourceScheme":"Secure","value":"360x748"}]']);
+            //获取可用cookie
+            $account = Account::where('can_use','1')->first();
+            if (!$account||!isset($account->cookie)){
+                exit('出错了');
+            }
+            $account->can_use = 0;
+            $account->save();
+            $return = $ads->createBrowser(['cookie'=>$account->cookie]);
             //成功创建浏览器
             if ($return) {
                 $ret = $ads->startBrowser();
@@ -82,6 +91,13 @@ class PostBadReview extends Command
                     $driver->findElement(WebDriverBy::xpath('/html/body/div[1]/div/div[4]/div/div/div/div[4]/ul/li/div/ul/li/a[2]'))->click();
                     sleep(3);
                     $driver->findElement(WebDriverBy::xpath("//*[contains(text(), 'English (US)')]"))->click();
+                    sleep(3);
+                    //尝试语言选择
+                    try {
+                        $driver->findElement(WebDriverBy::xpath("//*[contains(text(), 'Language for buttons, titles and other text from Facebook for this account on www.facebook.com')]"))->click();
+                    }catch (\Exception $exception){
+
+                    }
                     //打开指定链接
                     $driver->get($post_url);
                     sleep(3);
@@ -96,9 +112,14 @@ class PostBadReview extends Command
                     $driver->findElement(WebDriverBy::xpath("//*[contains(text(), 'Health')]"))->click();
                     sleep(3);
                     $driver->findElement(WebDriverBy::xpath("//*[contains(text(), 'Submit')]"))->click();
+                    $driver->close();
+                    sleep(5);
+                    $ads->deleteBrowser();
                 }
                 catch (\Exception $exception){
-                    echo $exception->getMessage();
+                    $driver->close();
+                    sleep(5);
+                    $ads->deleteBrowser();
                     continue;
                 }
             }

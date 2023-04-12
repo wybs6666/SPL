@@ -21,6 +21,14 @@ class AdsService
     public $webdriver = '';
     public $debug_port = '';
 
+    public function deleteBrowser(){
+        $return = CurlService::post(ADS_URL . '/api/v1/user/delete', ['user_ids' => [$this->id]]);
+        if (isset($return['code'])&&$return['code']==0){
+            return true;
+        }
+        return false;
+    }
+
     public function startBrowser($user_id = '')
     {
         $return = CurlService::get(ADS_URL . '/api/v1/browser/start', ['user_id' => $this->id,'launch_args'=>json_encode(['--disable-notifications'])]);
@@ -46,7 +54,8 @@ class AdsService
         ];
         $return = CurlService::post(ADS_URL . '/api/v1/user/create', [
             'group_id' => GROUP_ID,
-            'user_proxy_config' => ['proxy_soft'=>'no_proxy'],
+            //'user_proxy_config' => ['proxy_soft'=>'no_proxy'],
+            'user_proxy_config' => $proxy,
             'fingerprint_config' => [
                 'automatic_timezone' => 1
             ]]);
@@ -55,7 +64,7 @@ class AdsService
             $this->id = $return['data']['id'];
             $this->serial_number = $return['data']['serial_number'];
         }else{
-            throw new \Exception('创建浏览器失败');
+            return false;
         }
         if ($data){
             $this->updateBrowser($data);
