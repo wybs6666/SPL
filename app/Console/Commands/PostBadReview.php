@@ -102,7 +102,7 @@ class PostBadReview extends Command
                     $driver->get($post_url);
                     sleep(3);
                     //举报
-                    $driver->findElement(WebDriverBy::cssSelector('.xqcrz7y.x78zum5.x1qx5ct2.x1y1aw1k.x1sxyh0.xwib8y2.xurb0ha.xw4jnvo')) // find search input element
+                    $driver->findElement(WebDriverBy::cssSelector('.x1ey2m1c.xds687c.xg01cxk.x47corl.x10l6tqk.x17qophe.x13vifvy.x1ebt8du.x19991ni.x1dhq9h.x1wpzbip.x14yjl9h.xudhj91.x18nykt9.xww2gxu')) // find search input element
                     ->click();
                     sleep(3);
                     $driver->findElement(WebDriverBy::xpath("//*[contains(text(), 'Report post')]"))->click();
