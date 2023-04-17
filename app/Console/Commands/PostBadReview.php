@@ -112,6 +112,7 @@ class PostBadReview extends Command
                     $driver->findElement(WebDriverBy::xpath("//*[contains(text(), 'Health')]"))->click();
                     sleep(3);
                     $driver->findElement(WebDriverBy::xpath("//*[contains(text(), 'Submit')]"))->click();
+                    sleep(3);
                     $driver->close();
                     sleep(5);
                     $ads->deleteBrowser();
