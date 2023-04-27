@@ -4,11 +4,13 @@ namespace App\Console\Commands;
 
 use App\Models\Account;
 use App\Models\AccountLog;
+use App\Models\Comment;
 use App\Service\AdsService;
 use Facebook\WebDriver\Chrome\ChromeOptions;
 use Facebook\WebDriver\Remote\DesiredCapabilities;
 use Facebook\WebDriver\WebDriver;
 use Facebook\WebDriver\WebDriverBy;
+use Facebook\WebDriver\WebDriverKeys;
 use Illuminate\Console\Command;
 use Facebook\WebDriver\Remote\RemoteWebDriver;
 
@@ -21,7 +23,7 @@ class PostBadReview extends Command
      *
      * @var string
      */
-    protected $signature = 'PostBadReview {post_url} {times=1}';
+    protected $signature = 'PostBadReview {post_url} {times=1} {send_comment=0}';
 
     /**
      * The console command description.
@@ -49,6 +51,7 @@ class PostBadReview extends Command
     {
         $times = $this->argument('times');
         $post_url = $this->argument('post_url');
+        $send_comment = $this->argument('send_comment');
         for ($i = 1; $i <= $times; $i++) {
             //配置浏览器信息
             $ads = new AdsService();
@@ -101,6 +104,13 @@ class PostBadReview extends Command
                     //打开指定链接
                     $driver->get($post_url);
                     sleep(3);
+                    //添加评论
+                    if ($send_comment){
+                        //读取评论数据 0无类型1差评2好评
+                        $comments = Comment::where('type',$send_comment)->get();
+                        $count = count($driver->findElements(WebDriverBy::cssSelector(".xdj266r.x11i5rnm.xat24cr.x1mh8g0r")));
+                        $driver->findElements(WebDriverBy::cssSelector(".xdj266r.x11i5rnm.xat24cr.x1mh8g0r"))[$count-7]->click()->sendKeys($comments[rand(0,count($comments)-1)]->comment.WebDriverKeys::ENTER);
+                    }
                     //举报
                     $driver->findElements(WebDriverBy::cssSelector('.x1i10hfl.x6umtig.x1b1mbwd.xaqea5y.xav7gou.x1ypdohk.xe8uvvx.xdj266r.x11i5rnm.xat24cr.x1mh8g0r.x16tdsg8.x1hl2dhg.xggy1nq.x87ps6o.x1lku1pv.x1a2a7pz.x6s0dn4.x14yjl9h.xudhj91.x18nykt9.xww2gxu.x972fbf.xcfux6l.x1qhh985.xm0m39n.x9f619.x78zum5.xl56j7k.xexx8yu.x4uap5.x18d9i69.xkhd6sd.x1n2onr6.xc9qbxq.x14qfxbe.x1qhmfi1'))[1] // find search input element
                     ->click();
@@ -118,6 +128,7 @@ class PostBadReview extends Command
                     $ads->deleteBrowser();
                 }
                 catch (\Exception $exception){
+                    echo $exception->getMessage();
                     $driver->close();
                     sleep(5);
                     $ads->deleteBrowser();
