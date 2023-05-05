@@ -56,7 +56,7 @@ class PostBadReview extends Command
             //配置浏览器信息
             $ads = new AdsService();
             //获取可用cookie
-            $account = Account::where('can_use','1')->first();
+            $account = Account::where('can_use','1')->orderBy('id', 'desc')->first();
             if (!$account||!isset($account->cookie)){
                 exit('出错了');
             }
