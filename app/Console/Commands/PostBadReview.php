@@ -103,14 +103,27 @@ class PostBadReview extends Command
                     }
                     //打开指定链接
                     $driver->get($post_url);
+                    sleep(5);
+                    //评论内容
+                    $comments = Comment::where('type',$send_comment)->get();
+                    $content = $comments[rand(0,count($comments)-1)]->comment;
+                    //差评图片
+                    $count2 = count($driver->findElements(WebDriverBy::cssSelector('.x1i10hfl.x1qjc9v5.xjqpnuy.xa49m3k.xqeqjp1.x2hbi6w.x9f619.x1ypdohk.xdl72j9.x2lah0s.xe8uvvx.x2lwn1j.xeuugli.x16tdsg8.x1hl2dhg.xggy1nq.x1ja2u2z.x1t137rt.x1o1ewxj.x3x9cwd.x1e5q0jg.x13rtm0m.x1q0g3np.x87ps6o.x1lku1pv.x1a2a7pz.xjyslct.xjbqb8w.x13fuv20.xu3j5b3.x1q0q8m5.x26u7qi.x972fbf.xcfux6l.x1qhh985.xm0m39n.x3nfvp2.xdj266r.x11i5rnm.xat24cr.x1mh8g0r.xexx8yu.x4uap5.x18d9i69.xkhd6sd.x1n2onr6.x3ajldb.x194ut8o.x1vzenxt.xd7ygy7.xt298gk.x1xhcax0.x1s928wv.x10pfhc2.x1j6awrg.x1v53gu8.x1tfg27r.xitxdhh')));
+                    $driver->findElements(WebDriverBy::cssSelector('.x1i10hfl.x1qjc9v5.xjqpnuy.xa49m3k.xqeqjp1.x2hbi6w.x9f619.x1ypdohk.xdl72j9.x2lah0s.xe8uvvx.x2lwn1j.xeuugli.x16tdsg8.x1hl2dhg.xggy1nq.x1ja2u2z.x1t137rt.x1o1ewxj.x3x9cwd.x1e5q0jg.x13rtm0m.x1q0g3np.x87ps6o.x1lku1pv.x1a2a7pz.xjyslct.xjbqb8w.x13fuv20.xu3j5b3.x1q0q8m5.x26u7qi.x972fbf.xcfux6l.x1qhh985.xm0m39n.x3nfvp2.xdj266r.x11i5rnm.xat24cr.x1mh8g0r.xexx8yu.x4uap5.x18d9i69.xkhd6sd.x1n2onr6.x3ajldb.x194ut8o.x1vzenxt.xd7ygy7.xt298gk.x1xhcax0.x1s928wv.x10pfhc2.x1j6awrg.x1v53gu8.x1tfg27r.xitxdhh'))[$count2-2]->click();
+                    sleep(5);
+                    $driver->findElement(WebDriverBy::cssSelector('[aria-label="GIF search"]'))->sendKeys($content);
+                    sleep(5);
+                    //选择图片
+                    $driver->findElement(WebDriverBy::xpath('/html/body/div[1]/div/div[1]/div/div[3]/div/div/div/div[2]/div/div/div[1]/div[1]/div/div/div/div/div/div[2]/div/div[1]/div[1]'))->click();
                     sleep(3);
                     //添加评论
                     if ($send_comment){
                         //读取评论数据 0无类型1差评2好评
-                        $comments = Comment::where('type',$send_comment)->get();
-                        $count = count($driver->findElements(WebDriverBy::cssSelector(".xdj266r.x11i5rnm.xat24cr.x1mh8g0r")));
-                        $driver->findElements(WebDriverBy::cssSelector(".xdj266r.x11i5rnm.xat24cr.x1mh8g0r"))[$count-7]->click()->sendKeys($comments[rand(0,count($comments)-1)]->comment.WebDriverKeys::ENTER);
+                        //$count = count($driver->findElements(WebDriverBy::cssSelector(".xdj266r.x11i5rnm.xat24cr.x1mh8g0r")));
+                        //$driver->findElements(WebDriverBy::cssSelector(".xdj266r.x11i5rnm.xat24cr.x1mh8g0r"))[$count-1]->click()->sendKeys($comments[rand(0,count($comments)-1)]->comment.WebDriverKeys::ENTER);
+                        $driver->findElement(WebDriverBy::xpath("/html/body/div[1]/div/div[1]/div/div[3]/div/div/div/div[1]/div[1]/div/div/div[2]/div/div/div[1]/div/div/div[5]/div[2]/div/div[2]/div[1]/form/div/div[1]/div/div/div[1]/p"))->click()->sendKeys($content.WebDriverKeys::ENTER);
                     }
+                    sleep(3);
                     //举报
                     $driver->findElements(WebDriverBy::cssSelector('.x1i10hfl.x6umtig.x1b1mbwd.xaqea5y.xav7gou.x1ypdohk.xe8uvvx.xdj266r.x11i5rnm.xat24cr.x1mh8g0r.x16tdsg8.x1hl2dhg.xggy1nq.x87ps6o.x1lku1pv.x1a2a7pz.x6s0dn4.x14yjl9h.xudhj91.x18nykt9.xww2gxu.x972fbf.xcfux6l.x1qhh985.xm0m39n.x9f619.x78zum5.xl56j7k.xexx8yu.x4uap5.x18d9i69.xkhd6sd.x1n2onr6.xc9qbxq.x14qfxbe.x1qhmfi1'))[1] // find search input element
                     ->click();
