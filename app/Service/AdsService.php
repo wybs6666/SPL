@@ -73,8 +73,8 @@ class AdsService
         ];
         $return = CurlService::post(ADS_URL . '/api/v1/user/create', [
             'group_id' => $this->group_id,
-            'user_proxy_config' => ['proxy_soft'=>'no_proxy'],
-            //'user_proxy_config' => $proxy,
+            //'user_proxy_config' => ['proxy_soft'=>'no_proxy'],
+            'user_proxy_config' => $proxy,
             'fingerprint_config' => [
                 'automatic_timezone' => 1
             ]]);
