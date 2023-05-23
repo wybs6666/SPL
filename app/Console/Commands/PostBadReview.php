@@ -5,6 +5,7 @@ namespace App\Console\Commands;
 use App\Models\Account;
 use App\Models\AccountLog;
 use App\Models\Comment;
+use App\Models\CommentLog;
 use App\Service\AdsService;
 use Facebook\WebDriver\Chrome\ChromeOptions;
 use Facebook\WebDriver\Remote\DesiredCapabilities;
@@ -60,6 +61,10 @@ class PostBadReview extends Command
             if (!$account||!isset($account->cookie)){
                 exit('出错了');
             }
+            $comment_log = new CommentLog();
+            $comment_log->url = $post_url;
+            $comment_log->account_id = $account->id;
+            $comment_log->save();
             $account->can_use = 0;
             $account->save();
             $return = $ads->createBrowser(['cookie'=>$account->cookie]);
@@ -138,6 +143,8 @@ class PostBadReview extends Command
                     sleep(3);
                     $driver->close();
                     sleep(5);
+                    $comment_log->status = 1;
+                    $comment_log->save();
                     $ads->deleteBrowser();
                 }
                 catch (\Exception $exception){
