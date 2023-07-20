@@ -25,6 +25,7 @@ class AdsService
     {
         //寻找分组
         $return = CurlService::get(ADS_URL . '/api/v1/group/list', ['group_name' => 'FbBadReview']);
+		sleep(1);
         if (isset($return['code'])&&$return['code']==0&&count($return['data']['list'])>0){
             $this->group_id = $return['data']['list'][0]['group_id'];
         }
@@ -51,7 +52,7 @@ class AdsService
     public function startBrowser($user_id = '')
     {
         $return = CurlService::get(ADS_URL . '/api/v1/browser/start', ['user_id' => $this->id,'launch_args'=>json_encode(['--disable-notifications'])]);
-        if (isset($return['code'])&&$return['code']==0){
+	   if (isset($return['code'])&&$return['code']==0){
             $this->puppeteer = $return['data']['ws']['puppeteer'];
             $this->selenium = $return['data']['ws']['selenium'];
             $this->webdriver = str_replace(' ', '\ ', $return['data']['webdriver']);
@@ -78,7 +79,6 @@ class AdsService
             'fingerprint_config' => [
                 'automatic_timezone' => 1
             ]]);
-
         if (isset($return['code']) && $return['code'] == 0) {
             $this->id = $return['data']['id'];
             $this->serial_number = $return['data']['serial_number'];
